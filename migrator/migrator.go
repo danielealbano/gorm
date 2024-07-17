@@ -5,16 +5,13 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
+	"gorm.io/gorm/schema"
 	"reflect"
 	"regexp"
 	"strconv"
 	"strings"
-	"time"
-
-	"gorm.io/gorm"
-	"gorm.io/gorm/clause"
-	"gorm.io/gorm/logger"
-	"gorm.io/gorm/schema"
 )
 
 // This regular expression seeks to find a sequence of digits (\d+) among zero or more non-digit characters (\D*),
@@ -40,15 +37,6 @@ type Config struct {
 	CreateIndexAfterCreateTable bool
 	DB                          *gorm.DB
 	gorm.Dialector
-}
-
-type printSQLLogger struct {
-	logger.Interface
-}
-
-func (l *printSQLLogger) Trace(ctx context.Context, begin time.Time, fc func() (sql string, rowsAffected int64), err error) {
-	sql, _ := fc()
-	l.Interface.Trace(ctx, begin, fc, err)
 }
 
 // GormDataTypeInterface gorm data type interface
@@ -111,7 +99,7 @@ func (m Migrator) GetQueryAndExecTx() (queryTx, execTx *gorm.DB) {
 	execTx = queryTx
 	if m.DB.DryRun {
 		queryTx.DryRun = false
-		execTx = m.DB.Session(&gorm.Session{Logger: &printSQLLogger{Interface: m.DB.Logger}})
+		execTx = m.DB.Session(&gorm.Session{})
 	}
 	return queryTx, execTx
 }
