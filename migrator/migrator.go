@@ -48,7 +48,6 @@ type printSQLLogger struct {
 
 func (l *printSQLLogger) Trace(ctx context.Context, begin time.Time, fc func() (sql string, rowsAffected int64), err error) {
 	sql, _ := fc()
-	fmt.Println(sql + ";")
 	l.Interface.Trace(ctx, begin, fc, err)
 }
 
